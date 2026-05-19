@@ -1,0 +1,28 @@
+import { Router } from 'express';
+
+import authRoutes from './auth.routes.js';
+import accountRoutes from './account.routes.js';
+import categoryRoutes from './category.routes.js';
+import transactionRoutes from './transaction.routes.js';
+import budgetRoutes from './budget.routes.js';
+import debtRoutes from './debt.routes.js';
+import goalRoutes from './goal.routes.js';
+import portfolioRoutes from './portfolio.routes.js';
+import dashboardRoutes from './dashboard.routes.js';
+import profileRoutes from './profile.routes.js';
+import settingsRoutes from './settings.routes.js';
+
+const router = Router();
+
+router.use('/accounts', accountRoutes);
+router.use('/categories', categoryRoutes);
+router.use('/transactions', transactionRoutes);
+router.use('/budgets', budgetRoutes);
+router.use('/debts', debtRoutes);
+router.use('/goals', goalRoutes);
+router.use('/portfolio', portfolioRoutes);
+router.use('/dashboard', dashboardRoutes);
+router.use('/profile', profileRoutes);
+router.use('/settings', settingsRoutes);
+
+export default router;

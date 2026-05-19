@@ -1,0 +1,111 @@
+export declare const debtService: {
+    list(userId: string, type?: "utang" | "piutang", status?: string): Promise<{
+        id: string;
+        userId: string;
+        type: "utang" | "piutang";
+        title: string;
+        counterparty: string;
+        category: string | null;
+        totalAmount: string;
+        paidAmount: string;
+        icon: string | null;
+        dueDate: string | null;
+        recurringDay: number | null;
+        status: "active" | "paid_off" | "overdue" | "cancelled";
+        note: string | null;
+        createdAt: Date;
+        updatedAt: Date;
+    }[]>;
+    getById(userId: string, id: string): Promise<{
+        id: string;
+        userId: string;
+        type: "utang" | "piutang";
+        title: string;
+        counterparty: string;
+        category: string | null;
+        totalAmount: string;
+        paidAmount: string;
+        icon: string | null;
+        dueDate: string | null;
+        recurringDay: number | null;
+        status: "active" | "paid_off" | "overdue" | "cancelled";
+        note: string | null;
+        createdAt: Date;
+        updatedAt: Date;
+    }>;
+    create(userId: string, data: {
+        type: "utang" | "piutang";
+        title: string;
+        counterparty: string;
+        category?: string;
+        totalAmount: string;
+        icon?: string;
+        dueDate?: string;
+        recurringDay?: number;
+        note?: string;
+    }): Promise<{
+        id: string;
+        createdAt: Date;
+        updatedAt: Date;
+        userId: string;
+        type: "utang" | "piutang";
+        icon: string | null;
+        note: string | null;
+        category: string | null;
+        title: string;
+        counterparty: string;
+        totalAmount: string;
+        paidAmount: string;
+        dueDate: string | null;
+        recurringDay: number | null;
+        status: "active" | "paid_off" | "overdue" | "cancelled";
+    }>;
+    update(userId: string, id: string, data: Partial<{
+        title: string;
+        counterparty: string;
+        category: string;
+        totalAmount: string;
+        icon: string;
+        dueDate: string;
+        recurringDay: number;
+        status: "active" | "paid_off" | "overdue" | "cancelled";
+        note: string;
+    }>): Promise<{
+        id: string;
+        userId: string;
+        type: "utang" | "piutang";
+        title: string;
+        counterparty: string;
+        category: string | null;
+        totalAmount: string;
+        paidAmount: string;
+        icon: string | null;
+        dueDate: string | null;
+        recurringDay: number | null;
+        status: "active" | "paid_off" | "overdue" | "cancelled";
+        note: string | null;
+        createdAt: Date;
+        updatedAt: Date;
+    }>;
+    remove(userId: string, id: string): Promise<void>;
+    addPayment(userId: string, debtId: string, data: {
+        amount: string;
+        paidAt: string;
+        note?: string;
+    }): Promise<{
+        id: string;
+        createdAt: Date;
+        amount: string;
+        note: string | null;
+        debtId: string;
+        paidAt: string;
+    }>;
+    listPayments(userId: string, debtId: string): Promise<{
+        id: string;
+        debtId: string;
+        amount: string;
+        paidAt: string;
+        note: string | null;
+        createdAt: Date;
+    }[]>;
+};
