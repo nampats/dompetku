@@ -22,7 +22,7 @@ import { toNodeHandler } from 'better-auth/node';
 import { auth } from './lib/auth.js';
 
 // ── Auth Route (Must be before body parsers) ──
-app.all('/api/auth/(.*)', toNodeHandler(auth));
+app.use('/api/auth', toNodeHandler(auth));
 
 // ── Body Parsing ──
 app.use(express.json());
