@@ -46,6 +46,13 @@ const DashboardPage = () => {
 
   return (
     <>
+      <div className="flex gap-4 mb-stack-md overflow-x-auto pb-2">
+        <button className="bg-primary text-on-primary rounded-full px-4 py-1.5 font-label-md text-label-md whitespace-nowrap shadow-sm hover:shadow-primary/30 transition-shadow">Minggu Ini</button>
+        <button className="text-on-surface-variant border border-outline-variant/30 rounded-full px-4 py-1.5 font-label-md text-label-md hover:bg-secondary-container/20 transition-all whitespace-nowrap">Bulan Ini</button>
+        <button className="text-on-surface-variant border border-outline-variant/30 rounded-full px-4 py-1.5 font-label-md text-label-md hover:bg-secondary-container/20 transition-all whitespace-nowrap">3 Bulan</button>
+        <button className="text-on-surface-variant border border-outline-variant/30 rounded-full px-4 py-1.5 font-label-md text-label-md hover:bg-secondary-container/20 transition-all whitespace-nowrap">Tahun Ini</button>
+      </div>
+
       <section className="grid grid-cols-1 lg:grid-cols-3 gap-gutter mb-stack-lg">
         <WealthCard summary={summary} />
         <AssetDistribution summary={summary} />

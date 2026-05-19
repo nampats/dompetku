@@ -1,6 +1,8 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const WealthCard = ({ summary }) => {
+  const navigate = useNavigate();
   const netPosition = parseFloat(summary?.netPosition || 0);
 
   return (
@@ -20,7 +22,7 @@ const WealthCard = ({ summary }) => {
         </div>
       </div>
       <div className="mt-8 flex gap-4">
-        <button className="bg-gradient-to-r from-primary to-secondary text-on-primary px-6 py-2 rounded-lg font-label-md text-label-md font-bold flex items-center">
+        <button onClick={() => navigate('/transaksi')} className="bg-gradient-to-r from-primary to-secondary text-on-primary px-6 py-2 rounded-lg font-label-md text-label-md font-bold flex items-center">
           <span className="material-symbols-outlined mr-2">add</span> Tambah Saldo
         </button>
         <button className="glass-card border-primary text-primary px-6 py-2 rounded-lg font-label-md text-label-md font-bold">

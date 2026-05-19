@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useAuth } from '../../context/AuthContext';
 
 const AccountLinkedItem = ({ colorClass, bgClass, bankCode, bankName, maskedAccount }) => {
   return (
@@ -20,6 +21,7 @@ const AccountLinkedItem = ({ colorClass, bgClass, bankCode, bankName, maskedAcco
 };
 
 const Profil = () => {
+  const { user } = useAuth();
   const [profile, setProfile] = useState(null);
   const [accounts, setAccounts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -34,7 +36,8 @@ const Profil = () => {
         const profileJson = await profileRes.json();
         const accountsJson = await accountsRes.json();
 
-        if (profileJson.success) setProfile(profileJson.data);
+        // Menggabungkan data user dari auth context (primary) dengan data dari api (secondary)
+        if (profileJson.success) setProfile({ ...profileJson.data, ...user });
         if (accountsJson.success) setAccounts(accountsJson.data);
       } catch (err) {
         console.error('Failed to fetch profile data', err);

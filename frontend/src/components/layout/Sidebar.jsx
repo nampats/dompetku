@@ -1,5 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 
 const navItems = [
   { to: '/dashboard', icon: 'dashboard', label: 'Dashboard' },
@@ -11,6 +12,7 @@ const navItems = [
 ];
 
 const Sidebar = () => {
+  const { user } = useAuth();
   return (
     <nav className="hidden md:flex h-screen w-72 fixed left-0 top-0 bg-surface/80 dark:bg-surface/80 backdrop-blur-[20px] border-r border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.15)] flex-col p-stack-md z-50">
       <div className="mb-stack-lg">
@@ -18,13 +20,19 @@ const Sidebar = () => {
           DompetKu
         </h1>
         <NavLink to="/profil" className="flex items-center gap-3 mt-6 p-3 glass-card rounded-xl hover:ring-1 hover:ring-primary/30 transition-all">
-          <img 
-            alt="Foto Profil Ahmad" 
-            className="w-10 h-10 rounded-full object-cover" 
-            src="https://lh3.googleusercontent.com/aida-public/AB6AXuCm4aBYkY2f7FYNkQWD773R5ZKCdQJu5gT0oNgdbdjKw081i-1PUodqAScvnYuz2VB6dSsdqx0YXQBUV7gIextZipHj3GaMQUueiIWtNF4b20X_muy91tj9y03jCtOvsrcjJtdwK7-0WeWMqBV1DfDO-C0I02hgZ-jrc4-AD9vcv_aD7c-aV0feLfZ0UClC863ahVEWU74Fea5mHLjEQeyoEhe-OfiG1r_23eIlggJndtFB9PIa9GVTUyIXBBClNj313Q7zCrupDo0a" 
-          />
+          {user?.image ? (
+            <img 
+              alt={`Foto Profil ${user.name}`}
+              className="w-10 h-10 rounded-full object-cover" 
+              src={user.image} 
+            />
+          ) : (
+            <div className="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center text-primary font-bold">
+              {user?.name ? user.name.charAt(0).toUpperCase() : 'U'}
+            </div>
+          )}
           <div>
-            <p className="font-body-md text-on-surface font-semibold">Ahmad</p>
+            <p className="font-body-md text-on-surface font-semibold">{user?.name || 'User'}</p>
           </div>
         </NavLink>
       </div>

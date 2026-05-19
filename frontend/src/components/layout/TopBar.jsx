@@ -1,29 +1,70 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { useAuth } from '../../context/AuthContext';
 
 const TopBar = () => {
+  const { user } = useAuth();
+  const [isDark, setIsDark] = useState(true);
+
+  // Initialize theme from localStorage or default to dark
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'light') {
+      setIsDark(false);
+      document.documentElement.classList.remove('dark');
+      // In this specific setup with hardcoded colors in index.css for body, 
+      // full light mode requires more extensive CSS variables. 
+      // We will toggle a class so it can be expanded later.
+    } else {
+      setIsDark(true);
+      document.documentElement.classList.add('dark');
+    }
+  }, []);
+
+  const toggleTheme = () => {
+    const newTheme = !isDark ? 'dark' : 'light';
+    setIsDark(!isDark);
+    localStorage.setItem('theme', newTheme);
+    if (newTheme === 'dark') {
+      document.documentElement.classList.add('dark');
+      alert("Mode gelap diaktifkan.");
+    } else {
+      document.documentElement.classList.remove('dark');
+      alert("Mode terang belum didukung sepenuhnya di versi ini, CSS vars perlu dikonfigurasi.");
+    }
+  };
+
+  const handleNotification = () => {
+    alert("Tidak ada notifikasi baru.");
+  };
+
   return (
     <header className="w-full md:w-[calc(100%-288px)] md:ml-72 fixed top-0 right-0 z-40 bg-surface/40 backdrop-blur-[20px] border-b border-white/10 flex justify-between items-center px-container-padding-desktop py-stack-md">
       <div className="hidden md:flex gap-4">
-        <a className="bg-primary text-on-primary rounded-full px-4 py-1 font-label-md text-label-md" href="#">Minggu Ini</a>
-        <a className="text-on-surface-variant border border-outline-variant/30 rounded-full px-4 py-1 font-label-md text-label-md hover:bg-secondary-container/20 transition-all" href="#">Bulan Ini</a>
-        <a className="text-on-surface-variant border border-outline-variant/30 rounded-full px-4 py-1 font-label-md text-label-md hover:bg-secondary-container/20 transition-all" href="#">3 Bulan</a>
-        <a className="text-on-surface-variant border border-outline-variant/30 rounded-full px-4 py-1 font-label-md text-label-md hover:bg-secondary-container/20 transition-all" href="#">Tahun Ini</a>
+        {/* Waktu filter dipindahkan ke DashboardPage.jsx */}
       </div>
       <div className="md:hidden">
         <h1 className="font-headline-md text-headline-md font-bold text-primary">DompetKu</h1>
       </div>
-      <div className="flex items-center gap-4">
-        <button className="text-on-surface-variant hover:text-primary transition-colors">
+      <div className="flex items-center gap-4 ml-auto">
+        <button onClick={handleNotification} className="text-on-surface-variant hover:text-primary transition-colors">
           <span className="material-symbols-outlined">notifications</span>
         </button>
-        <button className="text-on-surface-variant hover:text-primary transition-colors">
-          <span className="material-symbols-outlined">contrast</span>
+        <button onClick={toggleTheme} className="text-on-surface-variant hover:text-primary transition-colors">
+          <span className="material-symbols-outlined">
+            {isDark ? 'light_mode' : 'dark_mode'}
+          </span>
         </button>
-        <img 
-          alt="Ahmad Profile" 
-          className="w-8 h-8 rounded-full object-cover md:hidden" 
-          src="https://lh3.googleusercontent.com/aida-public/AB6AXuAgYbibMfAj-U_O81iB4yQ4ZJixAOTrRs_fEIuoH6P70YOCf0Mramo6iXKGCZf5ZgWZN45C583eVqgTkWnlW9YiR8Oa7p6zbAVhaZBbNVxWvrvaH8espcyun3W3BgT850_s6IUXzo0iOxIDE3PfD3FLsrU3daB_Sg1-kEM2MlKP0vz6Uua6vmXBv7NKLozoljG5lmBubpTCecxfm3f-f4E4EIDL7r1pSb35k7le3ohYy2clptvHFBM_bDH3mV35annQ75czIt-lcJK5" 
-        />
+        {user?.image ? (
+          <img 
+            alt={`Profil ${user.name}`} 
+            className="w-8 h-8 rounded-full object-cover md:hidden" 
+            src={user.image} 
+          />
+        ) : (
+          <div className="w-8 h-8 rounded-full bg-primary-container md:hidden flex items-center justify-center text-primary font-bold text-xs">
+            {user?.name ? user.name.charAt(0).toUpperCase() : 'U'}
+          </div>
+        )}
       </div>
     </header>
   );

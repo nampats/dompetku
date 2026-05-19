@@ -228,12 +228,84 @@ const Pengaturan = () => {
           </>
         )}
         
-        {activeTab !== 'Integrasi' && (
-          <div className="flex-1 flex items-center justify-center p-stack-lg border-2 border-dashed border-outline-variant/20 rounded-2xl">
-            <div className="text-center">
-              <span className="material-symbols-outlined text-[48px] text-on-surface-variant/50 mb-4">construction</span>
-              <h3 className="font-headline-md text-headline-md text-on-surface-variant">Modul {activeTab} Belum Tersedia</h3>
-              <p className="font-body-md text-body-md text-on-surface-variant/70 mt-2">Fitur ini akan segera diimplementasikan.</p>
+        {activeTab === 'Preferensi Aplikasi' && (
+          <div className="animate-in fade-in zoom-in-95 duration-300">
+            <h3 className="font-headline-lg text-headline-lg text-on-surface mb-2">Preferensi Aplikasi</h3>
+            <p className="font-body-md text-body-md text-on-surface-variant mb-6">Sesuaikan tampilan dan format regional aplikasi.</p>
+            <div className="space-y-6">
+              <div className="glass-panel p-6 rounded-xl">
+                <h4 className="font-headline-md text-headline-md mb-4 text-on-surface">Regional</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-label-sm text-on-surface-variant mb-2">Mata Uang Dasar</label>
+                    <select className="w-full bg-surface-container border border-outline-variant/30 text-on-surface rounded-lg px-4 py-2.5 focus:outline-none focus:ring-1 focus:ring-primary">
+                      <option>IDR (Rupiah Indonesia)</option>
+                      <option>USD (US Dollar)</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-label-sm text-on-surface-variant mb-2">Zona Waktu</label>
+                    <select className="w-full bg-surface-container border border-outline-variant/30 text-on-surface rounded-lg px-4 py-2.5 focus:outline-none focus:ring-1 focus:ring-primary">
+                      <option>WIB (Asia/Jakarta)</option>
+                      <option>WITA (Asia/Makassar)</option>
+                      <option>WIT (Asia/Jayapura)</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'Keamanan & Privasi' && (
+          <div className="animate-in fade-in zoom-in-95 duration-300">
+            <h3 className="font-headline-lg text-headline-lg text-on-surface mb-2">Keamanan & Privasi</h3>
+            <p className="font-body-md text-body-md text-on-surface-variant mb-6">Kelola kata sandi dan autentikasi multi-faktor.</p>
+            <div className="space-y-6">
+              <div className="glass-panel p-6 rounded-xl flex items-center justify-between border border-outline-variant/10">
+                <div>
+                  <h4 className="font-headline-md text-headline-md text-on-surface">Autentikasi 2 Langkah (2FA)</h4>
+                  <p className="text-body-md text-on-surface-variant mt-1">Gunakan aplikasi autentikator untuk keamanan ekstra.</p>
+                </div>
+                <button className="bg-primary text-on-primary px-5 py-2.5 rounded-lg font-label-md hover:bg-primary/90 transition-colors">Aktifkan</button>
+              </div>
+              <div className="glass-panel p-6 rounded-xl flex items-center justify-between border border-outline-variant/10">
+                <div>
+                  <h4 className="font-headline-md text-headline-md text-on-surface">Sesi Aktif</h4>
+                  <p className="text-body-md text-on-surface-variant mt-1">Keluarkan akun dari semua perangkat lain.</p>
+                </div>
+                <button className="border border-error text-error hover:bg-error/10 px-5 py-2.5 rounded-lg font-label-md transition-colors">Logout Semua</button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'Notifikasi' && (
+          <div className="animate-in fade-in zoom-in-95 duration-300">
+            <h3 className="font-headline-lg text-headline-lg text-on-surface mb-2">Pengaturan Notifikasi</h3>
+            <p className="font-body-md text-body-md text-on-surface-variant mb-6">Pilih notifikasi apa saja yang ingin Anda terima.</p>
+            <div className="space-y-4 glass-panel p-6 rounded-xl border border-outline-variant/10">
+              <div className="flex items-center justify-between py-3 border-b border-white/5">
+                <div>
+                  <p className="font-headline-md text-on-surface">Peringatan Anggaran</p>
+                  <p className="text-body-sm text-on-surface-variant mt-1">Saat pengeluaran melebihi 80% dari batas.</p>
+                </div>
+                <input type="checkbox" defaultChecked className="w-5 h-5 accent-primary cursor-pointer" />
+              </div>
+              <div className="flex items-center justify-between py-3 border-b border-white/5">
+                <div>
+                  <p className="font-headline-md text-on-surface">Ringkasan Mingguan</p>
+                  <p className="text-body-sm text-on-surface-variant mt-1">Laporan arus kas setiap hari Senin.</p>
+                </div>
+                <input type="checkbox" defaultChecked className="w-5 h-5 accent-primary cursor-pointer" />
+              </div>
+              <div className="flex items-center justify-between py-3">
+                <div>
+                  <p className="font-headline-md text-on-surface">Notifikasi Login Baru</p>
+                  <p className="text-body-sm text-on-surface-variant mt-1">Email peringatan jika ada login tak dikenal.</p>
+                </div>
+                <input type="checkbox" defaultChecked className="w-5 h-5 accent-primary cursor-pointer" />
+              </div>
             </div>
           </div>
         )}
