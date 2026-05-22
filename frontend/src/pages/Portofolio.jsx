@@ -1,21 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import StockRow from '../components/portofolio/StockRow';
+import StockForm from '../components/portofolio/StockForm';
+import { useApiClient } from '../hooks/useApiClient';
+import { useAuth } from '../context/AuthContext';
 
 const Portofolio = () => {
+  const { user } = useAuth();
   const [stockData, setStockData] = useState([]);
+  const [showStockForm, setShowStockForm] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [summary, setSummary] = useState({
     totalValue: 0,
     totalPL: 0,
     plPercent: 0,
   });
+  const { apiFetch } = useApiClient();
 
-  useEffect(() => {
-    const fetchPortfolio = async () => {
-      try {
-        const res = await fetch('/api/portfolio');
-        const json = await res.json();
-        if (json.success && json.data) {
+  const fetchPortfolio = async () => {
+    setIsLoading(true);
+    try {
+      const json = await apiFetch('/api/portfolio');
+      if (json.success && json.data) {
           let totalCurrentValue = 0;
           let totalBuyValue = 0;
 
@@ -54,13 +59,14 @@ const Portofolio = () => {
             plPercent,
           });
         }
-      } catch (err) {
-        console.error('Failed to fetch portfolio:', err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+    } catch (err) {
+      console.error('Failed to fetch portfolio:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchPortfolio();
   }, []);
   return (
@@ -68,12 +74,16 @@ const Portofolio = () => {
       {/* Header Mobile */}
       <div className="md:hidden flex justify-between items-center pt-4">
         <h1 className="font-headline-lg-mobile text-headline-lg-mobile text-primary font-bold">Portofolio</h1>
-        <div className="w-10 h-10 rounded-full bg-surface-variant overflow-hidden border border-outline-variant/30">
-          <img
-            alt="Ahmad Profile"
-            className="w-full h-full object-cover"
-            src="https://lh3.googleusercontent.com/aida-public/AB6AXuDzj3f9HBRjkiPSObSmiNhD_Xh_U2NmkowyceOW2yM_w6WSKUzA7HeedwaUF2_iK-oYSyxqD3yyny07yPNrf1grcwb066SHOIMgGb-7J9TmqW3dFiQo-bHUoF84Z6SLomK6Cpe4XP9UQSdixjnJlZaHsaae7sHaUaFbPEJx4Uu2cGtZd17lqb9RhQXZjOk8vFsJIHCEhJSDoqnQB7J1SDzoFyH6YyfG0N5PrH9ZKeKAz22FhRmbBCgYbax-7UrDBtxuxxmNBut1AVoC"
-          />
+        <div className="w-10 h-10 rounded-full bg-surface-variant overflow-hidden border border-outline-variant/30 flex items-center justify-center font-bold text-primary">
+          {user?.image ? (
+            <img
+              alt={`Foto Profil ${user.name}`}
+              className="w-full h-full object-cover"
+              src={user.image}
+            />
+          ) : (
+            user?.name ? user.name.charAt(0).toUpperCase() : 'U'
+          )}
         </div>
       </div>
 
@@ -150,12 +160,22 @@ const Portofolio = () => {
         </div>
 
         <div className="p-card-padding border-t border-white/10 flex justify-center mt-auto">
-          <button className="flex items-center gap-2 bg-gradient-to-r from-primary to-inverse-primary text-on-primary px-6 py-3 rounded-full font-label-md text-label-md font-bold shadow-lg hover:opacity-90 transition-all hover:shadow-[0_0_20px_rgba(198,191,255,0.4)]">
+          <button onClick={() => setShowStockForm(true)} className="flex items-center gap-2 bg-gradient-to-r from-primary to-inverse-primary text-on-primary px-6 py-3 rounded-full font-label-md text-label-md font-bold shadow-lg hover:opacity-90 transition-all hover:shadow-[0_0_20px_rgba(198,191,255,0.4)]">
             <span className="material-symbols-outlined">add</span>
             Tambah Saham
           </button>
         </div>
       </section>
+
+      {showStockForm && (
+        <StockForm 
+          onClose={() => setShowStockForm(false)} 
+          onSuccess={() => {
+            setShowStockForm(false);
+            fetchPortfolio();
+          }} 
+        />
+      )}
     </div>
   );
 };

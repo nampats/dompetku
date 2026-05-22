@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { useApiClient } from '../../hooks/useApiClient';
+import Modal from '../ui/Modal';
 
 const GoalForm = ({ onClose, onSuccess }) => {
   const [formData, setFormData] = useState({
@@ -10,6 +12,8 @@ const GoalForm = ({ onClose, onSuccess }) => {
     color: '#00CEC9' // default secondary color
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [alertModal, setAlertModal] = useState({ isOpen: false, title: '', message: '', variant: 'error' });
+  const { apiFetch } = useApiClient();
 
   const inputClass =
     'w-full bg-surface-container border border-outline-variant/30 rounded-lg px-4 py-3 font-body-md text-body-md text-on-surface focus:border-primary focus:ring-1 focus:ring-primary transition-colors outline-none placeholder:text-on-surface-variant/50';
@@ -28,32 +32,30 @@ const GoalForm = ({ onClose, onSuccess }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.title || !formData.targetAmount) {
-      alert('Judul dan Target Nominal wajib diisi');
+      setAlertModal({ isOpen: true, title: 'Validasi', message: 'Judul dan Target Nominal wajib diisi', variant: 'error' });
       return;
     }
 
     setIsSubmitting(true);
     try {
-      const res = await fetch('/api/goals', {
+      const json = await apiFetch('/api/goals', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+        body: {
           ...formData,
           deadline: formData.deadline || undefined,
           currentAmount: formData.currentAmount || undefined,
-        })
+        }
       });
-      const json = await res.json();
       
       if (json.success) {
         if (onSuccess) onSuccess();
         onClose();
       } else {
-        alert(json.message || 'Gagal menyimpan target dana');
+        setAlertModal({ isOpen: true, title: 'Gagal', message: json.message || 'Gagal menyimpan target dana', variant: 'error' });
       }
     } catch (err) {
       console.error('Submit error:', err);
-      alert('Terjadi kesalahan saat menyimpan target dana.');
+      setAlertModal({ isOpen: true, title: 'Error', message: 'Terjadi kesalahan saat menyimpan target dana.', variant: 'error' });
     } finally {
       setIsSubmitting(false);
     }
@@ -192,6 +194,15 @@ const GoalForm = ({ onClose, onSuccess }) => {
           </div>
         </form>
       </div>
+
+      <Modal
+        isOpen={alertModal.isOpen}
+        onClose={() => setAlertModal(prev => ({ ...prev, isOpen: false }))}
+        title={alertModal.title}
+        variant={alertModal.variant}
+      >
+        {alertModal.message}
+      </Modal>
     </div>
   );
 };

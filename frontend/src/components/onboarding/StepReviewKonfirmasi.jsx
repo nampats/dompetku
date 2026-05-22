@@ -1,9 +1,13 @@
 import React, { useState } from 'react';
 import AccountItem from './AccountItem';
+import { useApiClient } from '../../../hooks/useApiClient';
+import Modal from '../../ui/Modal';
 
 const StepReviewKonfirmasi = ({ prevStep, profile, accounts }) => {
   const [isConfirming, setIsConfirming] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [errorModal, setErrorModal] = useState({ isOpen: false, message: '' });
+  const { apiFetch } = useApiClient();
 
   const totalSaldo = accounts.reduce((sum, acc) => {
     const val = parseFloat(acc.balance.replace(/[^0-9]/g, '')) || 0;
@@ -16,14 +20,13 @@ const StepReviewKonfirmasi = ({ prevStep, profile, accounts }) => {
     try {
       // 1. Update Profile (PATCH)
       if (profile.displayName) {
-        await fetch('/api/profile', {
+        await apiFetch('/api/profile', {
           method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name: profile.displayName })
+          body: { name: profile.displayName }
         });
       }
 
-      // 2. Create Accounts (POST loop)
+      // 2. Create Accounts and Initial Transactions
       const validAccounts = accounts.filter(a => a.name);
       for (const acc of validAccounts) {
         const typeMap = {
@@ -32,16 +35,30 @@ const StepReviewKonfirmasi = ({ prevStep, profile, accounts }) => {
           'E-Wallet': 'e_wallet'
         };
         const balance = acc.balance.replace(/[^0-9]/g, '');
+        const amount = balance || '0';
         
-        await fetch('/api/accounts', {
+        const newAccount = await apiFetch('/api/accounts', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
+          body: {
             name: acc.name,
             type: typeMap[acc.type] || 'bank',
-            initialBalance: balance || '0'
-          })
+            initialBalance: amount
+          }
         });
+
+        // Create initial transaction if balance > 0
+        if (parseFloat(amount) > 0 && newAccount?.data?.id) {
+          await apiFetch('/api/transactions', {
+            method: 'POST',
+            body: {
+              type: 'income',
+              toAccountId: newAccount.data.id,
+              amount: amount,
+              description: 'Saldo Awal',
+              date: new Date().toISOString()
+            }
+          });
+        }
       }
 
       setIsConfirming(false);
@@ -54,7 +71,7 @@ const StepReviewKonfirmasi = ({ prevStep, profile, accounts }) => {
     } catch (err) {
       console.error('Failed to submit onboarding data:', err);
       setIsConfirming(false);
-      alert('Terjadi kesalahan saat menyimpan data. Silakan coba lagi.');
+      setErrorModal({ isOpen: true, message: err.message || 'Terjadi kesalahan saat menyimpan data. Silakan coba lagi.' });
     }
   };
 
@@ -179,6 +196,14 @@ const StepReviewKonfirmasi = ({ prevStep, profile, accounts }) => {
           )}
         </footer>
       </div>
+      <Modal
+        isOpen={errorModal.isOpen}
+        onClose={() => setErrorModal({ isOpen: false, message: '' })}
+        title="Gagal Menyimpan"
+        variant="error"
+      >
+        {errorModal.message}
+      </Modal>
     </div>
   );
 };

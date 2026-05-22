@@ -72,7 +72,7 @@ const LandingPage = () => {
           </h1>
 
           <p className="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto mb-stack-lg leading-relaxed">
-            Dashboard premium dengan desain glassmorphism untuk memantau kekayaan Anda.
+            Dashboard premium untuk memantau kekayaan Anda.
           </p>
 
           {/* CTA Button */}

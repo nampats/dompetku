@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import TransactionForm from '../transaksi/TransactionForm';
 
 const WealthCard = ({ summary }) => {
   const navigate = useNavigate();
+  const [showTransferModal, setShowTransferModal] = useState(false);
   const netPosition = parseFloat(summary?.netPosition || 0);
 
   return (
@@ -25,10 +27,28 @@ const WealthCard = ({ summary }) => {
         <button onClick={() => navigate('/transaksi')} className="bg-gradient-to-r from-primary to-secondary text-on-primary px-6 py-2 rounded-lg font-label-md text-label-md font-bold flex items-center">
           <span className="material-symbols-outlined mr-2">add</span> Tambah Saldo
         </button>
-        <button className="glass-card border-primary text-primary px-6 py-2 rounded-lg font-label-md text-label-md font-bold">
+        <button 
+          onClick={() => setShowTransferModal(true)} 
+          className="glass-card border-primary text-primary px-6 py-2 rounded-lg font-label-md text-label-md font-bold hover:bg-primary/10 transition-colors"
+        >
           Transfer
         </button>
       </div>
+
+      {showTransferModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
+          <div className="w-full max-w-3xl">
+            <TransactionForm 
+              onClose={() => setShowTransferModal(false)}
+              onSuccess={() => {
+                setShowTransferModal(false);
+                window.location.reload(); // Quick refresh for now
+              }}
+              initialType="transfer"
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 };

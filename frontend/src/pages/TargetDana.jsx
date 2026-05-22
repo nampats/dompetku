@@ -1,17 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import GoalCard from '../components/target-dana/GoalCard';
 import GoalForm from '../components/target-dana/GoalForm';
+import { useApiClient } from '../hooks/useApiClient';
 
 const TargetDana = () => {
   const [goalsData, setGoalsData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
+  const { apiFetch } = useApiClient();
 
   const fetchGoals = async () => {
     setIsLoading(true);
     try {
-      const res = await fetch('/api/goals');
-      const json = await res.json();
+      const json = await apiFetch('/api/goals');
 
       if (json.success && json.data) {
         const formatted = json.data.map((goal) => {

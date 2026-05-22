@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import DebtCard from '../components/utang-piutang/DebtCard';
 import DebtForm from '../components/utang-piutang/DebtForm';
+import { useApiClient } from '../hooks/useApiClient';
 
 const UtangPiutang = () => {
   const [activeTab, setActiveTab] = useState('utang');
   const [debtRecords, setDebtRecords] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
+  const { apiFetch } = useApiClient();
   const [summary, setSummary] = useState({
     totalUtang: 0,
     totalPiutang: 0,
@@ -16,8 +18,7 @@ const UtangPiutang = () => {
   const fetchDebts = async () => {
     setIsLoading(true);
     try {
-      const res = await fetch('/api/debts');
-      const json = await res.json();
+      const json = await apiFetch('/api/debts');
       
       if (json.success && json.data) {
         let tUtang = 0;

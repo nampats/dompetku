@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useApiClient } from '../hooks/useApiClient';
+import Modal from '../components/ui/Modal';
 
 const AccountLinkedItem = ({ colorClass, bgClass, bankCode, bankName, maskedAccount }) => {
   return (
@@ -25,16 +27,16 @@ const Profil = () => {
   const [profile, setProfile] = useState(null);
   const [accounts, setAccounts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [infoModal, setInfoModal] = useState({ isOpen: false, title: '', message: '' });
+  const { apiFetch } = useApiClient();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [profileRes, accountsRes] = await Promise.all([
-          fetch('/api/profile'),
-          fetch('/api/accounts')
+        const [profileJson, accountsJson] = await Promise.all([
+          apiFetch('/api/profile'),
+          apiFetch('/api/accounts')
         ]);
-        const profileJson = await profileRes.json();
-        const accountsJson = await accountsRes.json();
 
         // Menggabungkan data user dari auth context (primary) dengan data dari api (secondary)
         if (profileJson.success) setProfile({ ...profileJson.data, ...user });
@@ -155,11 +157,17 @@ const Profil = () => {
               Lindungi akun Anda dengan memperbarui kredensial secara berkala.
             </p>
             <div className="space-y-3 mt-auto">
-              <button className="w-full bg-surface-container hover:bg-surface-container-high border border-outline-variant/20 text-on-surface font-label-md text-label-md py-3 rounded-xl transition-colors flex items-center justify-center gap-2">
+              <button 
+                onClick={() => setInfoModal({ isOpen: true, title: 'Segera Hadir', message: 'Fitur Ubah PIN akan segera tersedia di pembaruan berikutnya.' })}
+                className="w-full bg-surface-container hover:bg-surface-container-high border border-outline-variant/20 text-on-surface font-label-md text-label-md py-3 rounded-xl transition-colors flex items-center justify-center gap-2"
+              >
                 <span className="material-symbols-outlined text-[18px]">dialpad</span>
                 Ubah PIN
               </button>
-              <button className="w-full bg-surface-container hover:bg-surface-container-high border border-outline-variant/20 text-on-surface font-label-md text-label-md py-3 rounded-xl transition-colors flex items-center justify-center gap-2">
+              <button 
+                onClick={() => setInfoModal({ isOpen: true, title: 'Segera Hadir', message: 'Fitur Ubah Password akan segera tersedia di pembaruan berikutnya.' })}
+                className="w-full bg-surface-container hover:bg-surface-container-high border border-outline-variant/20 text-on-surface font-label-md text-label-md py-3 rounded-xl transition-colors flex items-center justify-center gap-2"
+              >
                 <span className="material-symbols-outlined text-[18px]">password</span>
                 Ubah Password
               </button>
@@ -168,6 +176,15 @@ const Profil = () => {
 
         </div>
       )}
+
+      <Modal
+        isOpen={infoModal.isOpen}
+        onClose={() => setInfoModal(prev => ({ ...prev, isOpen: false }))}
+        title={infoModal.title}
+        variant="info"
+      >
+        {infoModal.message}
+      </Modal>
     </div>
   );
 };

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import RankingItem from '../components/mutasi/RankingItem';
 import CategoryRow from '../components/mutasi/CategoryRow';
+import { useApiClient } from '../hooks/useApiClient';
 
 const MutasiKas = () => {
   const [summary, setSummary] = useState({ income: 0, expense: 0, lastIncome: 0, lastExpense: 0, totalBudget: 0, usedBudget: 0 });
@@ -8,6 +9,7 @@ const MutasiKas = () => {
   const [chartBars, setChartBars] = useState([]);
   const [categoryData, setCategoryData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const { apiFetch } = useApiClient();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -18,15 +20,11 @@ const MutasiKas = () => {
         const prevMonth = month === 1 ? 12 : month - 1;
         const prevYear = month === 1 ? year - 1 : year;
 
-        const [cfRes, topExRes, budgetRes, prevCfRes] = await Promise.all([
-          fetch(`/api/dashboard/cashflow?year=${year}`),
-          fetch(`/api/dashboard/top-expenses?month=${month}&year=${year}`),
-          fetch(`/api/budgets?month=${month}&year=${year}`),
-          fetch(`/api/dashboard/cashflow?year=${prevYear}`)
-        ]);
-
         const [cfJson, topExJson, budgetJson, prevCfJson] = await Promise.all([
-          cfRes.json(), topExRes.json(), budgetRes.json(), prevCfRes.json()
+          apiFetch(`/api/dashboard/cashflow?year=${year}`),
+          apiFetch(`/api/dashboard/top-expenses?month=${month}&year=${year}`),
+          apiFetch(`/api/budgets?month=${month}&year=${year}`),
+          apiFetch(`/api/dashboard/cashflow?year=${prevYear}`)
         ]);
 
         // 1. Process Summary
@@ -140,6 +138,34 @@ const MutasiKas = () => {
       </div>
     );
   }
+
+  const handleDownloadCSV = () => {
+    if (categoryData.length === 0) return;
+    
+    const headers = ['Kategori', 'Anggaran', 'Realisasi', 'Selisih', 'Status'];
+    const rows = categoryData.map(cat => [
+      cat.label,
+      cat.budget.replace(/Rp\s/g, '').replace(/\./g, ''),
+      cat.actual.replace(/Rp\s/g, '').replace(/\./g, ''),
+      cat.diff.replace(/[+\-\sRp]/g, '').replace(/\./g, ''),
+      cat.status
+    ]);
+    
+    const csvContent = [
+      headers.join(','),
+      ...rows.map(e => e.join(','))
+    ].join('\n');
+    
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `Laporan_Mutasi_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   const incomeChange = summary.lastIncome > 0 ? ((summary.income - summary.lastIncome) / summary.lastIncome) * 100 : 0;
   const expenseChange = summary.lastExpense > 0 ? ((summary.expense - summary.lastExpense) / summary.lastExpense) * 100 : 0;

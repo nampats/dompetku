@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { useApiClient } from '../hooks/useApiClient';
+import Modal from '../components/ui/Modal';
 
 const IntegrationCard = ({ title, type, icon, iconColor, glowColor, description, actionLabel, actionIcon, enabled, onToggle, fields }) => {
   return (
@@ -79,12 +81,13 @@ const Pengaturan = () => {
   });
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [alertModal, setAlertModal] = useState({ isOpen: false, title: '', message: '', variant: 'info' });
+  const { apiFetch } = useApiClient();
 
   useEffect(() => {
     const fetchSettings = async () => {
       try {
-        const res = await fetch('/api/settings');
-        const json = await res.json();
+        const json = await apiFetch('/api/settings');
         if (json.success && json.data) {
           setSettings(prev => ({ ...prev, ...json.data }));
         }
@@ -109,20 +112,18 @@ const Pengaturan = () => {
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      const res = await fetch('/api/settings', {
+      const json = await apiFetch('/api/settings', {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(settings)
+        body: settings
       });
-      const json = await res.json();
       if (json.success) {
-        alert('Pengaturan berhasil disimpan!');
+        setAlertModal({ isOpen: true, title: 'Berhasil', message: 'Pengaturan berhasil disimpan!', variant: 'success' });
       } else {
-        alert(json.message || 'Gagal menyimpan pengaturan');
+        setAlertModal({ isOpen: true, title: 'Gagal', message: json.message || 'Gagal menyimpan pengaturan', variant: 'error' });
       }
     } catch (err) {
       console.error('Save settings error:', err);
-      alert('Terjadi kesalahan saat menyimpan pengaturan.');
+      setAlertModal({ isOpen: true, title: 'Error', message: 'Terjadi kesalahan saat menyimpan pengaturan.', variant: 'error' });
     } finally {
       setIsSaving(false);
     }
@@ -310,6 +311,15 @@ const Pengaturan = () => {
           </div>
         )}
       </div>
+
+      <Modal
+        isOpen={alertModal.isOpen}
+        onClose={() => setAlertModal(prev => ({ ...prev, isOpen: false }))}
+        title={alertModal.title}
+        variant={alertModal.variant}
+      >
+        {alertModal.message}
+      </Modal>
     </div>
   );
 };

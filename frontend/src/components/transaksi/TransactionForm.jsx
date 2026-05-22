@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { useApiClient } from '../../hooks/useApiClient';
+import Modal from '../ui/Modal';
 
-const TransactionForm = ({ onClose, onSuccess }) => {
+const TransactionForm = ({ onClose, onSuccess, initialType = 'expense' }) => {
   const [formData, setFormData] = useState({
-    type: 'expense',
+    type: initialType,
     amount: '',
     date: new Date().toISOString().split('T')[0],
     categoryId: '',
@@ -15,16 +17,16 @@ const TransactionForm = ({ onClose, onSuccess }) => {
   const [categories, setCategories] = useState([]);
   const [accounts, setAccounts] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [alertModal, setAlertModal] = useState({ isOpen: false, title: '', message: '', variant: 'error' });
+  const { apiFetch } = useApiClient();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [catRes, accRes] = await Promise.all([
-          fetch('/api/categories'),
-          fetch('/api/accounts')
+        const [catJson, accJson] = await Promise.all([
+          apiFetch('/api/categories'),
+          apiFetch('/api/accounts')
         ]);
-        const catJson = await catRes.json();
-        const accJson = await accRes.json();
         
         if (catJson.success) setCategories(catJson.data);
         if (accJson.success) setAccounts(accJson.data);
@@ -48,32 +50,30 @@ const TransactionForm = ({ onClose, onSuccess }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.amount || !formData.description) {
-      alert('Nominal dan catatan wajib diisi');
+      setAlertModal({ isOpen: true, title: 'Validasi', message: 'Nominal dan catatan wajib diisi', variant: 'error' });
       return;
     }
 
     setIsSubmitting(true);
     try {
-      const res = await fetch('/api/transactions', {
+      const json = await apiFetch('/api/transactions', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+        body: {
           ...formData,
           categoryId: formData.categoryId || undefined,
           fromAccountId: formData.fromAccountId || undefined,
           toAccountId: formData.toAccountId || undefined,
-        })
+        }
       });
-      const json = await res.json();
       if (json.success) {
         if (onSuccess) onSuccess();
         onClose();
       } else {
-        alert(json.message || 'Gagal menyimpan transaksi');
+        setAlertModal({ isOpen: true, title: 'Gagal', message: json.message || 'Gagal menyimpan transaksi', variant: 'error' });
       }
     } catch (err) {
       console.error('Submit error:', err);
-      alert('Terjadi kesalahan saat menyimpan transaksi.');
+      setAlertModal({ isOpen: true, title: 'Error', message: 'Terjadi kesalahan saat menyimpan transaksi.', variant: 'error' });
     } finally {
       setIsSubmitting(false);
     }
@@ -225,6 +225,15 @@ const TransactionForm = ({ onClose, onSuccess }) => {
           </button>
         </div>
       </form>
+
+      <Modal
+        isOpen={alertModal.isOpen}
+        onClose={() => setAlertModal(prev => ({ ...prev, isOpen: false }))}
+        title={alertModal.title}
+        variant={alertModal.variant}
+      >
+        {alertModal.message}
+      </Modal>
     </div>
   );
 };

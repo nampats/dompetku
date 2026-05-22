@@ -6,25 +6,24 @@ import TopExpenses from '../components/dashboard/TopExpenses';
 import BudgetProgress from '../components/dashboard/BudgetProgress';
 import FinancialTargets from '../components/dashboard/FinancialTargets';
 import RecentTransactions from '../components/dashboard/RecentTransactions';
+import { useApiClient } from '../hooks/useApiClient';
 
 const DashboardPage = () => {
   const [summary, setSummary] = useState(null);
   const [cashflow, setCashflow] = useState(null);
   const [transactions, setTransactions] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [activeFilter, setActiveFilter] = useState('Minggu Ini');
+  const { apiFetch } = useApiClient();
 
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
         const year = new Date().getFullYear();
-        const [sumRes, cfRes, txRes] = await Promise.all([
-          fetch('/api/dashboard/summary'),
-          fetch(`/api/dashboard/cashflow?year=${year}`),
-          fetch('/api/transactions?limit=5')
-        ]);
-
         const [sumJson, cfJson, txJson] = await Promise.all([
-          sumRes.json(), cfRes.json(), txRes.json()
+          apiFetch('/api/dashboard/summary'),
+          apiFetch(`/api/dashboard/cashflow?year=${year}`),
+          apiFetch('/api/transactions?limit=5')
         ]);
 
         if (sumJson.success) setSummary(sumJson.data);
@@ -47,10 +46,19 @@ const DashboardPage = () => {
   return (
     <>
       <div className="flex gap-4 mb-stack-md overflow-x-auto pb-2">
-        <button className="bg-primary text-on-primary rounded-full px-4 py-1.5 font-label-md text-label-md whitespace-nowrap shadow-sm hover:shadow-primary/30 transition-shadow">Minggu Ini</button>
-        <button className="text-on-surface-variant border border-outline-variant/30 rounded-full px-4 py-1.5 font-label-md text-label-md hover:bg-secondary-container/20 transition-all whitespace-nowrap">Bulan Ini</button>
-        <button className="text-on-surface-variant border border-outline-variant/30 rounded-full px-4 py-1.5 font-label-md text-label-md hover:bg-secondary-container/20 transition-all whitespace-nowrap">3 Bulan</button>
-        <button className="text-on-surface-variant border border-outline-variant/30 rounded-full px-4 py-1.5 font-label-md text-label-md hover:bg-secondary-container/20 transition-all whitespace-nowrap">Tahun Ini</button>
+        {['Minggu Ini', 'Bulan Ini', '3 Bulan', 'Tahun Ini'].map(filter => (
+          <button 
+            key={filter}
+            onClick={() => setActiveFilter(filter)}
+            className={`rounded-full px-4 py-1.5 font-label-md text-label-md whitespace-nowrap transition-all ${
+              activeFilter === filter 
+                ? 'bg-primary text-on-primary shadow-sm hover:shadow-primary/30' 
+                : 'text-on-surface-variant border border-outline-variant/30 hover:bg-secondary-container/20'
+            }`}
+          >
+            {filter}
+          </button>
+        ))}
       </div>
 
       <section className="grid grid-cols-1 lg:grid-cols-3 gap-gutter mb-stack-lg">

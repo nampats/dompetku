@@ -1,18 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import TransactionRow from '../components/transaksi/TransactionRow';
 import TransactionForm from '../components/transaksi/TransactionForm';
+import { useApiClient } from '../hooks/useApiClient';
 
 const Transaksi = () => {
   const [showForm, setShowForm] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [transactions, setTransactions] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const { apiFetch } = useApiClient();
 
   const fetchTransactions = async () => {
     setIsLoading(true);
     try {
-      const res = await fetch('/api/transactions');
-      const json = await res.json();
+      const json = await apiFetch('/api/transactions');
       
       if (json.success && json.data) {
         const formattedData = json.data.map((tx) => ({

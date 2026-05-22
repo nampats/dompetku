@@ -1,4 +1,5 @@
 import React from 'react';
+import { useAuth } from './context/AuthContext';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import MainLayout from './components/layout/MainLayout';
 import ProtectedRoute from './components/auth/ProtectedRoute';
@@ -19,10 +20,22 @@ const App = () => {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Public routes — no auth required */}
-        <Route path="/landing" element={<LandingPage />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
+        {/* Public routes — redirect to dashboard if already authenticated */}
+        <Route path="/landing" element={
+          <PublicRoute>
+            <LandingPage />
+          </PublicRoute>
+        } />
+        <Route path="/login" element={
+          <PublicRoute>
+            <Login />
+          </PublicRoute>
+        } />
+        <Route path="/register" element={
+          <PublicRoute>
+            <Register />
+          </PublicRoute>
+        } />
 
         {/* Protected routes — auth required */}
         <Route element={<ProtectedRoute />}>
@@ -41,11 +54,28 @@ const App = () => {
           </Route>
         </Route>
 
-        {/* Default redirect */}
-        <Route path="*" element={<Navigate to="/landing" replace />} />
+        {/* Default redirect based on auth status is handled at the root / path */}
+        <Route path="/" element={<RootRedirect />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
   );
+};
+
+// Helper component for public routes
+const PublicRoute = ({ children }) => {
+  const { isAuthenticated, isLoading } = useAuth();
+  if (isLoading) return null; // or a loading spinner
+  if (isAuthenticated) return <Navigate to="/dashboard" replace />;
+  return children;
+};
+
+// Helper component for root redirect
+const RootRedirect = () => {
+  const { isAuthenticated, isLoading } = useAuth();
+  if (isLoading) return null;
+  return isAuthenticated ? <Navigate to="/dashboard" replace /> : <Navigate to="/landing" replace />;
+};
 };
 
 export default App;
