@@ -76,6 +76,5 @@ const RootRedirect = () => {
   if (isLoading) return null;
   return isAuthenticated ? <Navigate to="/dashboard" replace /> : <Navigate to="/landing" replace />;
 };
-};
 
 export default App;
