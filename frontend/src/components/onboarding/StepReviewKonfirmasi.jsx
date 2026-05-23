@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import AccountItem from './AccountItem';
 import { useApiClient } from '../../hooks/useApiClient';
-import Modal from '../../ui/Modal';
+import Modal from '../ui/Modal';
 
 const StepReviewKonfirmasi = ({ prevStep, profile, accounts }) => {
   const [isConfirming, setIsConfirming] = useState(false);
