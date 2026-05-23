@@ -5,6 +5,7 @@ const TopBar = ({ isCollapsed }) => {
   const { user } = useAuth();
   const [isDark, setIsDark] = useState(true);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [notifications, setNotifications] = useState([]);
   const notifRef = useRef(null);
 
   // Handle outside click for notifications
@@ -60,7 +61,9 @@ const TopBar = ({ isCollapsed }) => {
           >
             <span className="material-symbols-outlined">notifications</span>
             {/* Notification Dot */}
-            <span className="absolute top-1 right-1 w-2 h-2 bg-primary rounded-full"></span>
+            {notifications.length > 0 && (
+              <span className="absolute top-1 right-1 w-2 h-2 bg-primary rounded-full"></span>
+            )}
           </button>
           
           {/* Notification Dropdown */}
@@ -68,13 +71,17 @@ const TopBar = ({ isCollapsed }) => {
             <div className="absolute right-0 mt-2 w-72 bg-surface border border-outline-variant/20 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
               <div className="p-4 border-b border-outline-variant/10 flex justify-between items-center bg-surface-container-low">
                 <h4 className="font-headline-md text-on-surface">Notifikasi</h4>
-                <span className="text-xs px-2 py-1 bg-primary/10 text-primary rounded-full font-bold">1 Baru</span>
+                {notifications.length > 0 && (
+                  <span className="text-xs px-2 py-1 bg-primary/10 text-primary rounded-full font-bold">{notifications.length} Baru</span>
+                )}
               </div>
               <div className="p-4 text-center">
                 <div className="w-12 h-12 bg-surface-container rounded-full flex items-center justify-center mx-auto mb-3">
                   <span className="material-symbols-outlined text-on-surface-variant">notifications_paused</span>
                 </div>
-                <p className="font-body-md text-on-surface-variant">Belum ada notifikasi transaksi baru hari ini.</p>
+                <p className="font-body-md text-on-surface-variant">
+                  {notifications.length > 0 ? 'Anda memiliki notifikasi baru.' : 'Belum ada notifikasi baru hari ini.'}
+                </p>
               </div>
               <div className="p-3 border-t border-outline-variant/10 text-center bg-surface-container-lowest hover:bg-surface-container transition-colors cursor-pointer">
                 <span className="text-primary font-label-sm text-label-sm">Tandai semua dibaca</span>

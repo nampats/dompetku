@@ -28,8 +28,8 @@ const TransactionForm = ({ onClose, onSuccess, initialType = 'expense' }) => {
           apiFetch('/api/accounts')
         ]);
         
-        if (catJson.success) setCategories(catJson.data);
-        if (accJson.success) setAccounts(accJson.data);
+        if (catJson) setCategories(catJson.data || (Array.isArray(catJson) ? catJson : []));
+        if (accJson) setAccounts(accJson.data || (Array.isArray(accJson) ? accJson : []));
       } catch (err) {
         console.error('Failed to fetch form options:', err);
       }

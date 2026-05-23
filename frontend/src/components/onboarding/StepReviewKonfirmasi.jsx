@@ -1,9 +1,13 @@
 import React, { useState } from 'react';
 import AccountItem from './AccountItem';
 import { useApiClient } from '../../hooks/useApiClient';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 import Modal from '../ui/Modal';
 
 const StepReviewKonfirmasi = ({ prevStep, profile, accounts }) => {
+  const navigate = useNavigate();
+  const { refreshSession } = useAuth();
   const [isConfirming, setIsConfirming] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [errorModal, setErrorModal] = useState({ isOpen: false, message: '' });
@@ -66,7 +70,8 @@ const StepReviewKonfirmasi = ({ prevStep, profile, accounts }) => {
       
       // Navigate to dashboard after success
       setTimeout(() => {
-        window.location.href = '/dashboard';
+        refreshSession();
+        navigate('/dashboard');
       }, 1500);
     } catch (err) {
       console.error('Failed to submit onboarding data:', err);
